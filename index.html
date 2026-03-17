@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinStatement — Institutional Financial Reporting</title>
+  <meta name="description" content="Upload your trial balance, bank statements, AR/AP aging, and debt schedules. Get an AI-powered three-statement financial model in seconds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Fallback via jsDelivr if Google Fonts blocked -->
+  <style>
+    @font-face {
+      font-family: 'Playfair Display';
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url('https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5/files/playfair-display-latin-400-normal.woff2') format('woff2');
+      unicode-range: U+0000-00FF;
+    }
+    @font-face {
+      font-family: 'IBM Plex Sans';
+      font-style: normal;
+      font-weight: 300 500;
+      font-display: swap;
+      src: url('https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-sans@5/files/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+      unicode-range: U+0000-00FF;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      font-style: normal;
+      font-weight: 400 500;
+      font-display: swap;
+      src: url('https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@5/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+      unicode-range: U+0000-00FF;
+    }
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════
+       LANDING / HERO
+  ════════════════════════════════════════════════════ -->
+  <div id="page-landing" class="page active">
+    <nav class="nav">
+      <div class="nav-logo">
+        <span class="logo-mark">◆</span>
+        <span class="logo-text">FinStatement</span>
+      </div>
+      <div class="nav-links">
+        <a href="#" onclick="showPage('page-app'); return false;">Launch App</a>
+        <a href="https://github.com" target="_blank">GitHub</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-eyebrow">Three-Statement Financial Modeling · AI-Powered</div>
+      <h1 class="hero-title">
+        Institutional-grade<br/>
+        <em>financial reporting</em><br/>
+        for every business.
+      </h1>
+      <p class="hero-sub">
+        Upload your trial balance, bank statements, AR/AP aging, debt schedules, and credit card statements.
+        Get a fully reconciled Income Statement, Balance Sheet, and Cash Flow Statement — with CFO-level AI analysis.
+      </p>
+      <div class="hero-cta">
+        <button class="btn-hero" onclick="showPage('page-app')">
+          Launch Free Tool &nbsp;→
+        </button>
+        <span class="hero-note">No account required · Data never stored</span>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feat-icon">◈</div>
+          <div class="feat-title">Three-Statement Model</div>
+          <div class="feat-desc">Auto-generated P&L, Balance Sheet, and Cash Flow Statement from your raw data.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">◉</div>
+          <div class="feat-title">AI CFO Analysis</div>
+          <div class="feat-desc">Claude reads your financials and surfaces the insights a senior analyst would flag.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">◇</div>
+          <div class="feat-title">Multi-Source Upload</div>
+          <div class="feat-desc">Trial balance, bank statements, AR/AP aging, debt schedules, credit card data.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">◆</div>
+          <div class="feat-title">Export Ready</div>
+          <div class="feat-desc">Download your complete financial model as a formatted Excel workbook.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="landing-footer">
+      <div>Built with the Anthropic Claude API · Open-source on GitHub</div>
+      <div>Data is processed in your browser and sent only to Anthropic's API · Never stored</div>
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       MAIN APPLICATION
+  ════════════════════════════════════════════════════ -->
+  <div id="page-app" class="page">
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <button class="back-btn" onclick="showPage('page-landing')">← Back</button>
+        <div class="app-logo">
+          <span class="logo-mark">◆</span>
+          <span class="logo-text">FinStatement</span>
+        </div>
+      </div>
+      <div class="app-header-center">
+        <div id="company-display" class="company-display" style="display:none;">
+          <span id="company-name-display"></span>
+          <span class="period-badge" id="period-badge"></span>
+        </div>
+      </div>
+      <div class="app-header-right">
+        <div class="api-status" id="api-status">
+          <span class="status-dot"></span>
+          <span class="status-text">API Key Required</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Nav -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="upload" onclick="switchTab('upload', this)">
+        <span class="tab-icon">⬆</span> Data Upload
+      </button>
+      <button class="tab-btn" data-tab="income" onclick="switchTab('income', this)">
+        Income Statement
+      </button>
+      <button class="tab-btn" data-tab="balance" onclick="switchTab('balance', this)">
+        Balance Sheet
+      </button>
+      <button class="tab-btn" data-tab="cashflow" onclick="switchTab('cashflow', this)">
+        Cash Flow
+      </button>
+      <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard', this)">
+        <span class="tab-icon">◆</span> Executive Dashboard
+      </button>
+    </nav>
+
+    <!-- ── UPLOAD TAB ── -->
+    <div id="tab-upload" class="tab-pane active">
+      <div class="pane-inner">
+
+        <div class="pane-header">
+          <div>
+            <h2 class="pane-title">Upload Financial Documents</h2>
+            <p class="pane-sub">Upload one or more documents below. The AI will parse, classify, and reconcile all sources automatically.</p>
+          </div>
+        </div>
+
+        <!-- API Key Setup -->
+        <div class="setup-card" id="api-setup-card">
+          <div class="setup-header">
+            <div class="setup-icon">◆</div>
+            <div>
+              <div class="setup-title">Connect Your Anthropic API Key</div>
+              <div class="setup-desc">Required for AI-powered analysis. Your key is stored only in your browser session and never transmitted to any server other than Anthropic.</div>
+            </div>
+          </div>
+          <div class="api-input-row">
+            <input type="password" id="api-key-input" class="api-input" placeholder="sk-ant-api03-..." />
+            <button class="btn-connect" onclick="connectAPI()">Connect →</button>
+          </div>
+          <div class="api-helper">
+            Don't have a key? Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+          </div>
+        </div>
+
+        <!-- Company Info -->
+        <div class="section-label">Company Information</div>
+        <div class="company-form">
+          <div class="form-field">
+            <label>Company Name</label>
+            <input type="text" id="company-name" placeholder="Acme Corporation" />
+          </div>
+          <div class="form-field">
+            <label>Reporting Period</label>
+            <input type="text" id="reporting-period" placeholder="Q4 2024 / FY 2024 / Month ended Dec 31, 2024" />
+          </div>
+          <div class="form-field">
+            <label>Currency</label>
+            <select id="currency">
+              <option value="USD">USD — US Dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="CAD">CAD — Canadian Dollar</option>
+              <option value="AUD">AUD — Australian Dollar</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Scale</label>
+            <select id="scale">
+              <option value="1">Actuals (no rounding)</option>
+              <option value="1000" selected>Thousands ($000s)</option>
+              <option value="1000000">Millions ($M)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Upload Zones -->
+        <div class="section-label">Upload Documents</div>
+
+        <div class="upload-primary">
+          <div class="upload-zone primary-zone" id="zone-tb" onclick="triggerUpload('file-tb')"
+            ondragover="dragOver(event,'zone-tb')" ondragleave="dragLeave('zone-tb')" ondrop="dropFile(event,'zone-tb','tb')">
+            <input type="file" id="file-tb" hidden accept=".csv,.xlsx,.xls,.txt" multiple onchange="fileSelected(this,'tb')" />
+            <div class="uz-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
+            <div class="uz-title">Trial Balance <span class="uz-required">Required</span></div>
+            <div class="uz-desc">The primary source for all three statements. Include account names, codes, and net balances.</div>
+            <div class="uz-formats">CSV &nbsp;·&nbsp; XLSX &nbsp;·&nbsp; XLS</div>
+          </div>
+        </div>
+
+        <div class="upload-secondary-grid">
+          <div class="upload-zone" id="zone-bank" onclick="triggerUpload('file-bank')"
+            ondragover="dragOver(event,'zone-bank')" ondragleave="dragLeave('zone-bank')" ondrop="dropFile(event,'zone-bank','bank')">
+            <input type="file" id="file-bank" hidden accept=".csv,.xlsx,.xls,.pdf" multiple onchange="fileSelected(this,'bank')" />
+            <div class="uz-icon-sm">💳</div>
+            <div class="uz-title-sm">Bank Statements</div>
+            <div class="uz-desc-sm">Cash reconciliation & beginning/ending balances</div>
+          </div>
+
+          <div class="upload-zone" id="zone-ar" onclick="triggerUpload('file-ar')"
+            ondragover="dragOver(event,'zone-ar')" ondragleave="dragLeave('zone-ar')" ondrop="dropFile(event,'zone-ar','ar')">
+            <input type="file" id="file-ar" hidden accept=".csv,.xlsx,.xls,.pdf" multiple onchange="fileSelected(this,'ar')" />
+            <div class="uz-icon-sm">📋</div>
+            <div class="uz-title-sm">AR / AP Aging</div>
+            <div class="uz-desc-sm">Working capital & collectibility analysis</div>
+          </div>
+
+          <div class="upload-zone" id="zone-debt" onclick="triggerUpload('file-debt')"
+            ondragover="dragOver(event,'zone-debt')" ondragleave="dragLeave('zone-debt')" ondrop="dropFile(event,'zone-debt','debt')">
+            <input type="file" id="file-debt" hidden accept=".csv,.xlsx,.xls,.pdf" multiple onchange="fileSelected(this,'debt')" />
+            <div class="uz-icon-sm">🏦</div>
+            <div class="uz-title-sm">Debt Schedules</div>
+            <div class="uz-desc-sm">Loan amortization, interest, covenant tracking</div>
+          </div>
+
+          <div class="upload-zone" id="zone-cc" onclick="triggerUpload('file-cc')"
+            ondragover="dragOver(event,'zone-cc')" ondragleave="dragLeave('zone-cc')" ondrop="dropFile(event,'zone-cc','cc')">
+            <input type="file" id="file-cc" hidden accept=".csv,.xlsx,.xls,.pdf" multiple onchange="fileSelected(this,'cc')" />
+            <div class="uz-icon-sm">💰</div>
+            <div class="uz-title-sm">Credit Card Statements</div>
+            <div class="uz-desc-sm">Expense categorization & accrual support</div>
+          </div>
+
+          <div class="upload-zone" id="zone-other" onclick="triggerUpload('file-other')"
+            ondragover="dragOver(event,'zone-other')" ondragleave="dragLeave('zone-other')" ondrop="dropFile(event,'zone-other','other')">
+            <input type="file" id="file-other" hidden accept=".csv,.xlsx,.xls,.pdf" multiple onchange="fileSelected(this,'other')" />
+            <div class="uz-icon-sm">📎</div>
+            <div class="uz-title-sm">Other Schedules</div>
+            <div class="uz-desc-sm">Fixed asset rolls, equity statements, budgets</div>
+          </div>
+        </div>
+
+        <!-- File Lists -->
+        <div id="file-lists" class="file-lists"></div>
+
+        <!-- Mapping -->
+        <div class="section-label" id="mapping-section" style="display:none;">Column Mapping — Trial Balance</div>
+        <div id="mapping-grid" class="mapping-grid" style="display:none;"></div>
+
+        <!-- Generate -->
+        <div class="generate-row">
+          <button class="btn-demo" onclick="loadDemoData()">Load Demo Data</button>
+          <button class="btn-generate" id="btn-generate" onclick="generateModel()" disabled>
+            <span id="btn-generate-text">Generate Financial Model →</span>
+          </button>
+        </div>
+
+        <!-- Progress -->
+        <div id="progress-panel" class="progress-panel" style="display:none;">
+          <div class="progress-header">
+            <div class="progress-spinner"></div>
+            <div id="progress-label" class="progress-label">Initializing...</div>
+          </div>
+          <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+          <div id="progress-steps" class="progress-steps"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── INCOME STATEMENT TAB ── -->
+    <div id="tab-income" class="tab-pane">
+      <div class="pane-inner">
+        <div class="pane-header">
+          <div>
+            <h2 class="pane-title">Income Statement</h2>
+            <p class="pane-sub" id="is-period-label">Upload your trial balance to generate this statement.</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn-action" onclick="askAI('income')">Analyze with AI ↗</button>
+            <button class="btn-action-outline" onclick="exportStatement('income')">Export CSV</button>
+          </div>
+        </div>
+        <div id="is-kpis" class="kpi-strip"></div>
+        <div id="is-content" class="stmt-placeholder">
+          <div class="placeholder-icon">◈</div>
+          <div class="placeholder-text">Income Statement will appear here after processing</div>
+        </div>
+        <div id="is-analysis" class="analysis-panel" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── BALANCE SHEET TAB ── -->
+    <div id="tab-balance" class="tab-pane">
+      <div class="pane-inner">
+        <div class="pane-header">
+          <div>
+            <h2 class="pane-title">Balance Sheet</h2>
+            <p class="pane-sub" id="bs-period-label">Upload your trial balance to generate this statement.</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn-action" onclick="askAI('balance')">Analyze with AI ↗</button>
+            <button class="btn-action-outline" onclick="exportStatement('balance')">Export CSV</button>
+          </div>
+        </div>
+        <div id="bs-kpis" class="kpi-strip"></div>
+        <div id="bs-content" class="stmt-placeholder">
+          <div class="placeholder-icon">◇</div>
+          <div class="placeholder-text">Balance Sheet will appear here after processing</div>
+        </div>
+        <div id="bs-analysis" class="analysis-panel" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── CASH FLOW TAB ── -->
+    <div id="tab-cashflow" class="tab-pane">
+      <div class="pane-inner">
+        <div class="pane-header">
+          <div>
+            <h2 class="pane-title">Cash Flow Statement</h2>
+            <p class="pane-sub" id="cf-period-label">Upload your trial balance to generate this statement.</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn-action" onclick="askAI('cashflow')">Analyze with AI ↗</button>
+            <button class="btn-action-outline" onclick="exportStatement('cashflow')">Export CSV</button>
+          </div>
+        </div>
+        <div id="cf-kpis" class="kpi-strip"></div>
+        <div id="cf-content" class="stmt-placeholder">
+          <div class="placeholder-icon">◉</div>
+          <div class="placeholder-text">Cash Flow Statement will appear here after processing</div>
+        </div>
+        <div id="cf-analysis" class="analysis-panel" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── EXECUTIVE DASHBOARD TAB ── -->
+    <div id="tab-dashboard" class="tab-pane">
+      <div class="pane-inner">
+        <div class="pane-header">
+          <div>
+            <h2 class="pane-title">Executive Dashboard</h2>
+            <p class="pane-sub" id="dash-period-label">Comprehensive financial overview with AI-powered insights.</p>
+          </div>
+          <div class="pane-actions">
+            <button class="btn-action" onclick="askAI('full')">Full CFO Narrative ↗</button>
+            <button class="btn-action-outline" onclick="exportAll()">Export All Statements</button>
+          </div>
+        </div>
+        <div id="dash-content" class="stmt-placeholder">
+          <div class="placeholder-icon">◆</div>
+          <div class="placeholder-text">Executive Dashboard will appear here after processing</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AI Chat Drawer -->
+  <div id="ai-drawer" class="ai-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <span class="drawer-mark">◆</span> AI Financial Analyst
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div id="drawer-messages" class="drawer-messages"></div>
+    <div class="drawer-input-row">
+      <input type="text" id="drawer-input" class="drawer-input" placeholder="Ask a follow-up question..." onkeydown="if(event.key==='Enter') sendFollowUp()" />
+      <button class="drawer-send" onclick="sendFollowUp()">→</button>
+    </div>
+  </div>
+  <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
