@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Finance Model — FinStatement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .pf-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .pf-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .pf-header h1 {
+      font-size: 2.2em;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #0a1628;
+      margin-bottom: 8px;
+    }
+
+    .pf-header p {
+      font-size: 0.95em;
+      color: #666;
+    }
+
+    .pf-upload-section {
+      background: #f9f7f3;
+      border: 2px solid #e0dcd6;
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    .pf-upload-group {
+      margin-bottom: 25px;
+    }
+
+    .pf-upload-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #0a1628;
+      font-size: 0.95em;
+    }
+
+    .pf-upload-group small {
+      display: block;
+      color: #999;
+      margin-bottom: 10px;
+      font-size: 0.85em;
+    }
+
+    .pf-file-input {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d0ccc6;
+      border-radius: 4px;
+      font-size: 0.9em;
+      background: white;
+    }
+
+    .pf-file-input:focus {
+      outline: none;
+      border-color: #c9a84c;
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+    }
+
+    .pf-button {
+      background: #c9a84c;
+      color: #0a1628;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+
+    .pf-button:hover {
+      background: #b89938;
+    }
+
+    .pf-button:disabled {
+      background: #d0ccc6;
+      cursor: not-allowed;
+    }
+
+    .pf-results {
+      display: none;
+    }
+
+    .pf-results.active {
+      display: block;
+    }
+
+    .pf-summary {
+      background: white;
+      border: 1px solid #e0dcd6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .pf-summary h3 {
+      font-size: 1.1em;
+      color: #0a1628;
+      margin-bottom: 15px;
+    }
+
+    .pf-summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0ebe0;
+      font-size: 0.9em;
+    }
+
+    .pf-summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .pf-summary-label {
+      color: #666;
+    }
+
+    .pf-summary-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      color: #0a1628;
+    }
+
+    .pf-export-btn {
+      background: #0a1628;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+    .pf-export-btn:hover {
+      background: #1a2638;
+    }
+
+    .pf-loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      display: none;
+    }
+
+    .pf-error {
+      background: #fee;
+      border: 1px solid #f99;
+      color: #c33;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body style="background: white;">
+
+  <div class="pf-container">
+    <div class="pf-header">
+      <h1>Personal Finance Model</h1>
+      <p>Upload your bank, credit, and Venmo statements to generate a CFO-ready cash flow and P&L</p>
+    </div>
+
+    <div class="pf-error" id="pf-error"></div>
+
+    <div id="pf-upload-area" class="pf-upload-section">
+      <div class="pf-upload-group">
+        <label for="bank-file">Bank Statement (CSV)</label>
+        <small>US Bank checking — check deposits, transfers, loan payments</small>
+        <input type="file" id="bank-file" class="pf-file-input" accept=".csv" />
+      </div>
+
+      <div class="pf-upload-group">
+        <label for="citi-file">Credit Card Statement (CSV)</label>
+        <small>Citi credit card — purchases and autopay</small>
+        <input type="file" id="citi-file" class="pf-file-input" accept=".csv" />
+      </div>
+
+      <div class="pf-upload-group">
+        <label for="venmo-files">Venmo Statements (CSV) — Select all 3 months</label>
+        <small>Jan, Feb, Mar account activity CSVs</small>
+        <input type="file" id="venmo-files" class="pf-file-input" accept=".csv" multiple />
+      </div>
+
+      <button class="pf-button" id="process-btn">Generate Financial Model</button>
+    </div>
+
+    <div class="pf-loading" id="pf-loading">Processing your statements...</div>
+
+    <div class="pf-results" id="pf-results">
+      <div class="pf-summary">
+        <h3>📊 YTD Summary (Jan–Mar 2026)</h3>
+        <div class="pf-summary-row">
+          <span class="pf-summary-label">Total Transactions</span>
+          <span class="pf-summary-value" id="summary-txns">—</span>
+        </div>
+        <div class="pf-summary-row">
+          <span class="pf-summary-label">Total Income</span>
+          <span class="pf-summary-value" id="summary-income">—</span>
+        </div>
+        <div class="pf-summary-row">
+          <span class="pf-summary-label">Total Expenses</span>
+          <span class="pf-summary-value" id="summary-expenses">—</span>
+        </div>
+        <div class="pf-summary-row">
+          <span class="pf-summary-label">Net Income</span>
+          <span class="pf-summary-value" id="summary-net">—</span>
+        </div>
+        <button class="pf-export-btn" onclick="downloadTrialBalance()">📥 Download Trial Balance (CSV)</button>
+        <button class="pf-export-btn" onclick="downloadTransactions()">📥 Download Transactions (CSV)</button>
+      </div>
+
+      <div id="trial-balance-container" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
+  <script src="js/personal-finance-adapter.js"></script>
+  <script>
+    let lastResult = null;
+
+    document.getElementById('process-btn').addEventListener('click', async () => {
+      const bankFile = document.getElementById('bank-file').files[0];
+      const citiFile = document.getElementById('citi-file').files[0];
+      const venmoFiles = document.getElementById('venmo-files').files;
+
+      if (!bankFile) {
+        showError('Please upload a bank statement');
+        return;
+      }
+
+      showLoading(true);
+      hideError();
+
+      try {
+        const bankCsv = await readFile(bankFile);
+        const citiCsv = citiFile ? await readFile(citiFile) : '';
+        const venmoCsvs = [];
+        for (let i = 0; i < venmoFiles.length; i++) {
+          venmoCsvs.push(await readFile(venmoFiles[i]));
+        }
+
+        const result = PersonalFinanceAdapter.adaptPersonalFinance(bankCsv, citiCsv, venmoCsvs);
+        lastResult = result;
+
+        displayResults(result);
+      } catch (err) {
+        showError('Error processing files: ' + err.message);
+        console.error(err);
+      } finally {
+        showLoading(false);
+      }
+    });
+
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = e => reject(new Error('Failed to read file'));
+        reader.readAsText(file);
+      });
+    }
+
+    function displayResults(result) {
+      const { summary, trial_balance } = result;
+
+      document.getElementById('summary-txns').textContent = summary.total_transactions;
+      document.getElementById('summary-income').textContent = '$' + summary.total_income.toFixed(2);
+      document.getElementById('summary-expenses').textContent = '$' + summary.total_expenses.toFixed(2);
+      document.getElementById('summary-net').textContent = '$' + (summary.total_income - summary.total_expenses).toFixed(2);
+
+      // Trial balance table
+      let tableHtml = '<div style="margin-top: 20px;"><h3>Trial Balance</h3><table style="width:100%; border-collapse: collapse; font-size: 0.9em;"><thead><tr style="border-bottom: 2px solid #0a1628;"><th style="text-align:left; padding: 8px;">Account</th><th style="text-align:right; padding: 8px;">Balance</th></tr></thead><tbody>';
+      for (const acct of trial_balance) {
+        const balance = parseFloat(acct['Net Balance']);
+        tableHtml += `<tr style="border-bottom: 1px solid #e0dcd6;">
+          <td style="padding: 8px;">${acct['Account Name']}</td>
+          <td style="text-align:right; padding: 8px; font-family: 'IBM Plex Mono', monospace;">$${balance.toFixed(2)}</td>
+        </tr>`;
+      }
+      tableHtml += '</tbody></table></div>';
+      document.getElementById('trial-balance-container').innerHTML = tableHtml;
+
+      document.getElementById('pf-results').classList.add('active');
+      document.getElementById('pf-upload-area').style.display = 'none';
+    }
+
+    function downloadTrialBalance() {
+      if (!lastResult) return;
+      const tb = lastResult.trial_balance;
+      const csv = 'Account No.,Account Name,Net Balance\n' + tb.map(a => `"${a['Account No.']}","${a['Account Name']}",${a['Net Balance']}`).join('\n');
+      downloadCsv(csv, 'trial-balance.csv');
+    }
+
+    function downloadTransactions() {
+      if (!lastResult) return;
+      const txns = lastResult.transactions;
+      const csv = 'Date,Description,Amount,Category,Subcategory,Type\n' +
+        txns.map(t => `"${t.date}","${t.description}",${t.amount},"${t.category}","${t.subcategory}","${t.type}"`).join('\n');
+      downloadCsv(csv, 'transactions.csv');
+    }
+
+    function downloadCsv(csv, filename) {
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function showLoading(show) {
+      document.getElementById('pf-loading').style.display = show ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('pf-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('pf-error').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
